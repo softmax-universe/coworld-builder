@@ -62,7 +62,7 @@ ELEV=(-H "X-Use-Elevated-Privileges: true" -H 'content-type: application/json')
    without a `player` field (bullwhip's run: `bullwhip-steady:v1`). Never invent a name here:
    ```bash
    CH1=$(jq -r '.policies.champion1' runs/<run>/STATE.json)   # e.g. bullwhip-steady:v1
-   gh workflow run coworld-submit.yml -R Metta-AI/cogame-<slug> --ref main \
+   gh workflow run coworld-submit.yml -R softmax-universe/cogame-<slug> --ref main \
      -f player_id=ply_44ae9048-3242-4654-881f-6d9d43347fa3 \
      -f policy="$CH1" -f league_id="$L"
    ```
@@ -80,7 +80,7 @@ ELEV=(-H "X-Use-Elevated-Privileges: true" -H 'content-type: application/json')
    phase 40 uploaded while daveey-1 was active (bullwhip's run: `bullwhip-forecaster:v1`):
    ```bash
    CH2=$(jq -r '.policies.champion2' runs/<run>/STATE.json)   # e.g. bullwhip-forecaster:v1
-   gh workflow run coworld-submit.yml -R Metta-AI/cogame-<slug> --ref main \
+   gh workflow run coworld-submit.yml -R softmax-universe/cogame-<slug> --ref main \
      -f player_id=ply_bac48eb1-662e-44f8-973d-f3e016dccf5d \
      -f policy="$CH2" -f league_id="$L"
    ```

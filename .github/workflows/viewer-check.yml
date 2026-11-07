@@ -5,7 +5,7 @@
 # itself; it dispatches this workflow against the iframe `src` it read in
 # check 6 and reads the result out of the artifact.
 #
-#   gh workflow run viewer-check.yml -R Metta-AI/coworld-builder \
+#   gh workflow run viewer-check.yml -R softmax-universe/coworld-builder \
 #     -f url='https://api.observatory.softmax-research.net/v2/coworlds/replays/static/<cow_id>/<sha>/index.html?replay=<s3 replay url>'
 #
 # It exists because cogame-lantern shipped a viewer that deadlocked forever

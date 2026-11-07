@@ -2,10 +2,10 @@
 
 Purpose: give the shipped coworld its dot on the Softmax Atlas (`https://softmax.com/atlas`), so
 the map never falls behind the leagues. Owner: coordinator. One pull request against
-`Metta-AI/metta`, opened by a workflow, merged by itself.
+`softmax-universe/softmax`, opened by a workflow for review and merge.
 
 The atlas is a **static page built from a snapshot**: adding a coworld means one line in
-`places.mjs`, a re-run of `fetch-stats.mjs` + `build.mjs`, and a commit of the regenerated
+`geography/cities.json`, a re-run of `fetch-stats.ts` + `build.mjs`, and a commit of the regenerated
 `public/atlas/index.html`. The sandbox has neither node nor a metta mount, so — exactly as with
 every compile in this system — you decide, and GitHub Actions does the mechanical half.
 
@@ -14,7 +14,7 @@ every compile in this system — you decide, and GitHub Actions does the mechani
 - `STATE.slug`, `STATE.run`, `STATE.league.id`; `runs/<run>/design.md` (what kind of game it is —
   that is what picks the continent).
 - `tools/atlas_spot.py` and `.github/workflows/atlas-update.yml` in this repo.
-- `Metta-AI/metta` → `web/softmax.com/src/scripts/atlas/README.md` is **authoritative** for
+- `softmax-universe/softmax` → `workspaces/web/web-client/scripts/atlas/README.md` is **authoritative** for
   everything this prompt summarises. Read it if anything below does not match what you see.
 
 ## Procedure
@@ -24,7 +24,7 @@ every compile in this system — you decide, and GitHub Actions does the mechani
    (`templates/STATE.template.json` ships it as `""`, which means not yet done.)
 
    **Never enter this phase before phase 60 passed.** `build.mjs` refuses a `CITIES` line whose
-   slug `/api/coworlds` does not list (`places.mjs names a league that is not in
+   slug `/api/coworlds` does not list (`geography/cities.json names a league that is not in
    data/coworld-stats.json`), and a league with no completed rounds is not there yet.
 
 1. **Confirm the slug the atlas keys on** — it is the `slug` from the public directory, not your
@@ -54,9 +54,12 @@ every compile in this system — you decide, and GitHub Actions does the mechani
 3. **Pick the coordinates.** Overview units — the map as a 1024×1024 image. Read the live geometry
    and let the tool find the room:
    ```bash
-   gh api repos/Metta-AI/metta/contents/web/softmax.com/src/scripts/atlas/places.mjs \
-     -H 'Accept: application/vnd.github.raw' > /tmp/places.mjs
-   python3 /workspace/coworld-builder/tools/atlas_spot.py --places /tmp/places.mjs --region <key>
+   mkdir -p /tmp/atlas-geography
+   for file in cities.json regions.mjs region-paths.mjs; do
+     gh api "repos/softmax-universe/softmax/contents/workspaces/web/web-client/scripts/atlas/geography/$file" \
+       -H 'Accept: application/vnd.github.raw' > "/tmp/atlas-geography/$file"
+   done
+   python3 /workspace/coworld-builder/tools/atlas_spot.py --geography /tmp/atlas-geography --region <key>
    # -> "425 553 42.6"  = x, y, and how far the nearest neighbour is
    ```
    It sweeps the continent's **outline** (`REGION_PATHS`) intersected with its fly-to `box`, keeps
@@ -76,7 +79,7 @@ every compile in this system — you decide, and GitHub Actions does the mechani
 
 5. **Dispatch the workflow.**
    ```bash
-   gh workflow run atlas-update.yml -R Metta-AI/coworld-builder \
+   gh workflow run atlas-update.yml -R softmax-universe/coworld-builder \
      -f slug="$SLUG" -f label="$LABEL" -f x=<x> -f y=<y> -f region=<key> \
      -f anchor=c -f run="$RUN"
    ```
@@ -85,16 +88,16 @@ every compile in this system — you decide, and GitHub Actions does the mechani
    to hurry it:
    ```bash
    sleep 10
-   RID=$(gh run list -R Metta-AI/coworld-builder -w atlas-update.yml -L 5 \
+   RID=$(gh run list -R softmax-universe/coworld-builder -w atlas-update.yml -L 5 \
           --json databaseId,createdAt -q '.[0].databaseId')
-   gh run watch "$RID" -R Metta-AI/coworld-builder --exit-status || true
+   gh run watch "$RID" -R softmax-universe/coworld-builder --exit-status || true
    ```
    Write `<UTC> 75 atlas dispatch=<RID> region=<key> at=<x>,<y> clearance=<d>` to `log.md` as soon
    as you have the id — before the watch, so a session that dies mid-watch leaves a trail.
 
 6. **Read the result from the artifact, never from the run's conclusion.**
    ```bash
-   gh run download "$RID" -R Metta-AI/coworld-builder -n atlas-result -D /tmp/atlas
+   gh run download "$RID" -R softmax-universe/coworld-builder -n atlas-result -D /tmp/atlas
    jq . /tmp/atlas/atlas-result.json
    ```
    **Check `.slug` is yours** before believing it: another heartbeat's dispatch can be newer than
@@ -109,7 +112,7 @@ every compile in this system — you decide, and GitHub Actions does the mechani
 
 7. **Record it and move on.** Write STATE in one push:
    ```json
-   "atlas": {"status": "pr_open", "pr_url": "https://github.com/Metta-AI/metta/pull/…",
+   "atlas": {"status": "pr_open", "pr_url": "https://github.com/softmax-universe/softmax/pull/…",
              "branch": "atlas/<slug>-<run id>", "region": "commons", "x": 425, "y": 553,
              "dispatch_run_id": "<RID>", "attempted_at": "<UTC>"}
    ```
@@ -132,13 +135,13 @@ every compile in this system — you decide, and GitHub Actions does the mechani
    **new dispatch** (every dispatch branches from a fresh `main` under a run-unique name — there is
    no force-push here, ever, `AGENT.md` hard rule 2):
 
-   - `unplaced leagues (add them to CITIES in places.mjs): a, b` — other coworlds shipped and were
+   - `unplaced leagues (add them to cities in geography/cities.json): a, b` — other coworlds shipped and were
      never placed; the atlas cannot build until they are. Place them too: read each one's `name`
      and `description` from `/api/coworlds`, pick its continent from the step-2 table, run
      `atlas_spot.py` for it, and pass them all in `extra_cities` on the next dispatch:
      `-f extra_cities='[["ledger","Ledger",470,600,"commons",null,"c"]]'`. That is what the input
      is for. Name every league you placed for someone else in `log.md`.
-   - `places.mjs names a league that is not in data/coworld-stats.json: x` — league `x` is gone
+   - `geography/cities.json names a league that is not in data/coworld-stats.json: x` — league `x` is gone
      from softmax.com and its map line is stale: `-f drop_slugs=x`. Removing a dead league's line
      from a map is not deleting a league — hard rule 3 is about the league itself.
    - `step=place … outside the <region> box` — the coordinates were hand-picked or the region was
@@ -146,7 +149,7 @@ every compile in this system — you decide, and GitHub Actions does the mechani
      check.
    - `step=fetch-stats` — softmax.com was flaky, or one league page changed shape. Re-dispatch
      once. If it fails again naming the **same** league, the theater's payload shape moved and the
-     regexes in `fetch-stats.mjs` need a human: give up (below) with that league named.
+     standings fetch needs investigation: give up (below) with that league named.
 
    **Three dispatches, then give up — and give up is not phase 90.** The coworld is already
    built, released, ranked, verified and announced; a missing dot on a map must never park a
@@ -171,7 +174,7 @@ complete; `STATE.phase` is `"80"`, committed and pushed.
 - `log.md`: the `75 atlas dispatch=…` line, the `75 atlas pr=…` / `75 atlas unplaced …` line, and
   `progress phase=75 marker=<pr url>`.
 - Asana: phase-75 subtask completed, one comment with the PR url; on give-up, one Fleet card.
-- `Metta-AI/metta`: one branch and one pull request, opened by the workflow — never a direct push
+- `softmax-universe/softmax`: one branch and one pull request, opened by the workflow — never a direct push
   to `main`.
 
 ## Retry budget

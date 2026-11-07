@@ -15,14 +15,14 @@ Owner: designer sub-agent, accepted (or bounced) by the coordinator against the 
 
 | Game shape | Starter (mount) | Lineage |
 |---|---|---|
-| Turn-based / talk / cards / board / dice / bluff; game logic native; policy = LLM prompt | `Metta-AI/cogame-babel` (`/workspace/starters/cogame-babel`) — the best current parley-stack template. Fall back to a newer descendant (`cogame-bullwhip`, `/workspace/starters/cogame-bullwhip`) if it is closer. | parley → cosino → focus → babel → bullwhip |
-| **Any real-time game loop** (grid OR continuous physics, new rules written for this coworld), RL-vector policies | `Metta-AI/coworld-ctf` (paintbot) — `/workspace/starters/coworld-ctf` | ctf |
-| Bit-exact port of an **existing, external** C/RL environment (the rules already exist as code you must reproduce; e.g. NMMO, MOBA) | `Metta-AI/cogame-moba` + `docs/PORTING.md` — `/workspace/starters/cogame-moba` | moba → nmmo |
+| Turn-based / talk / cards / board / dice / bluff; game logic native; policy = LLM prompt | `softmax-universe/cogame-babel` (`/workspace/starters/cogame-babel`) — the best current parley-stack template. Fall back to a newer descendant (`cogame-bullwhip`, `/workspace/starters/cogame-bullwhip`) if it is closer. | parley → cosino → focus → babel → bullwhip |
+| **Any real-time game loop** (grid OR continuous physics, new rules written for this coworld), RL-vector policies | `softmax-universe/coworld-ctf` (paintbot) — `/workspace/starters/coworld-ctf` | ctf |
+| Bit-exact port of an **existing, external** C/RL environment (the rules already exist as code you must reproduce; e.g. NMMO, MOBA) | `softmax-universe/cogame-moba` + `docs/PORTING.md` — `/workspace/starters/cogame-moba` | moba → nmmo |
 
 A new physics game (Box2D soccer, hide-and-seek, couch-carrying) is the FIRST row, not the second — nothing pre-exists to port; paintbot supplies the loop, the per-tick replay, the static viewer and the chrome, and you swap the arena rules for the physics sim. (Operator ruling 2026-08-22, Cogball.)
-| Game logic in an external engine/process | `Metta-AI/cogame-factorio` (Python connector, per-seat servers) — `/workspace/starters/cogame-factorio` | factorio |
+| Game logic in an external engine/process | `softmax-universe/cogame-factorio` (Python connector, per-seat servers) — `/workspace/starters/cogame-factorio` | factorio |
 
-`Metta-AI/cogame-parley` is mounted too (`/workspace/starters/cogame-parley`) as the lineage's
+`softmax-universe/cogame-parley` is mounted too (`/workspace/starters/cogame-parley`) as the lineage's
 root reference.
 
 Ambiguity between two starters is a **rail**: pick the one with the closer turn structure and log
@@ -34,7 +34,7 @@ the reason. Never go to phase 90 for a starter choice.
 2. Choose the starter from the table; write `STATE.starter`.
 3. Send the **designer** brief (self-contained):
 
-   > Write the design note for a new coworld at `Metta-AI/cogame-<slug>`, forked from
+   > Write the design note for a new coworld at `softmax-universe/cogame-<slug>`, forked from
    > `<starter>` (mounted read-only at `/workspace/starters/<starter>`). Source idea, verbatim:
    > `<idea text>`.
    > Output exactly one file: `docs/plans/<YYYY-MM-DD>-<slug>-design.md` in the new repo, with

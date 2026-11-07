@@ -9,7 +9,7 @@
 # free and the coordinator is only paid for when there is work. The coordinator still runs
 # prompts/00-claim.md in full when fired; every race guard in there is unchanged.
 #
-# Manual run: gh workflow run heartbeat-gate.yml -R Metta-AI/coworld-builder -f fire=false
+# Manual run: gh workflow run heartbeat-gate.yml -R softmax-universe/coworld-builder -f fire=false
 # (decision only, nothing fired). The job log has the decision JSON; the step summary has the outcome.
 #
 # Board-read errors fail the job; the next scheduled run retries. GitHub Actions tracks recovery.

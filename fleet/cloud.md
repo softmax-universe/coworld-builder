@@ -108,6 +108,11 @@ API key is stored anywhere**. The coordinator never runs it and never reads its 
 | config | `fleet/costbot.json` (fleet name, deployment-name prefixes, workspace id, Discord channel) |
 | workflow | `costbot.yml`: cron `30 0 * * *` UTC + `workflow_dispatch` (inputs `day`, `post`) |
 | federation | issuer `github-actions` `fdis_013v83o6VBFNGqfjrB42wN5p`; rule `gha-coworld-builder` `fdrl_01BTD9UxCJYG7XH92mYyvWJD` (subject `repo:Metta-AI@178685062/coworld-builder@1343083865:ref:refs/heads/main`, audience `https://api.anthropic.com`, scope `workspace:developer`, `token_lifetime_seconds` 900); service account `sa-coworld-builder` `svac_01GWpPtRHsvnM2msLzpTLFuk` (member of this workspace) |
+
+The documented federation subject above uses the previous GitHub owner. Before changing the rule ID in either workflow,
+verify the live provider rule and a trusted run’s OIDC subject. Add a rule for the current subject, prove token exchange,
+then retire the old rule.
+
 | secret | `DISCORD_BOT_TOKEN` repo secret (the disco bot, from Secrets Manager `vault/discord/disco/app`) — the only one |
 | destination | disco's DM channel with David Bloomin, `1477593964675862618` |
 | numbers | the API's `usage.list_cost` per session and per thread (list price; billed may be lower). Sessions counted by UTC start; a message carrying `[costbot coworld-builder <day>]` already in the channel means that day is done and a re-run does not post again |
@@ -173,9 +178,9 @@ One message per run, phase 70 only. See AGENT.md §Hard safety rules.
 
 | what | value |
 |---|---|
-| this repo (read-write mount at `/workspace/coworld-builder`) | `https://github.com/Metta-AI/coworld-builder` |
+| this repo (read-write mount at `/workspace/coworld-builder`) | `https://github.com/softmax-universe/coworld-builder` |
 | cogamer (read mount at `/workspace/cogamer`, for `fleet/PROTOCOLS.md`) | `https://github.com/daveey/cogamer` |
-| starters (read mounts at `/workspace/starters/<name>`) | `Metta-AI/`: `cogame-babel`, `cogame-bullwhip`, `cogame-parley`, `coworld-ctf`, `cogame-moba`, `cogame-factorio` |
-| coworld repos created per run | `https://github.com/Metta-AI/cogame-<slug>` |
-| the atlas (phase 75) | `Metta-AI/metta` — **not mounted**; `atlas-update.yml` checks it out in CI with `GH_PAT` and opens one PR per run against `web/softmax.com/src/scripts/atlas/`. The agent never pushes to `metta` main and never merges the PR by hand |
-| CI credentials | repo secrets on `Metta-AI/coworld-builder`: `SOFTMAX_TOKEN`, `ANTHROPIC_API_KEY`, `GH_PAT` (user token, admin on Metta-AI repos — the fleet mount-token convention); `.github/workflows/propagate-secrets.yml` copies the first two onto any `Metta-AI/<repo>` with it. No GitHub App: the org apps are installed on softmax-agents, not Metta-AI |
+| starters (read mounts at `/workspace/starters/<name>`) | `softmax-universe/`: `cogame-babel`, `cogame-bullwhip`, `cogame-parley`, `coworld-ctf`, `cogame-moba`, `cogame-factorio` |
+| coworld repos created per run | `https://github.com/softmax-universe/cogame-<slug>` |
+| the atlas (phase 75) | `softmax-universe/softmax` — **not mounted**; `atlas-update.yml` checks it out in CI with `GH_PAT` and opens one PR per run against `workspaces/web/web-client/scripts/atlas/`. The agent never pushes to `softmax` main and never merges the PR by hand |
+| CI credentials | repo secrets on `softmax-universe/coworld-builder`: `SOFTMAX_TOKEN`, `ANTHROPIC_API_KEY`, `GH_PAT` (user token, admin on softmax-universe repos — the fleet mount-token convention); `.github/workflows/propagate-secrets.yml` copies the first two onto any `softmax-universe/<repo>` with it. |

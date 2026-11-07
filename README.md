@@ -4,7 +4,7 @@ An autonomous builder for coworlds. A managed agent wakes up whenever the queue 
 `.github/workflows/heartbeat-gate.yml` checks every 20 minutes for free and fires one of three
 deployments on the same coordinator (`coworld-builder-a`/`-b`/`-c`; their own hourly crons are
 paused) — takes the top unclaimed idea off the Asana **Coworld Ideas** board, and carries it all the way to
-a shipped game: a public `Metta-AI/cogame-<slug>` repo, a certified coworld on softmax.com, a league with
+a shipped game: a public `softmax-universe/cogame-<slug>` repo, a certified coworld on softmax.com, a league with
 two ranked champions and filler baselines, at least two completed rounds whose replays render
 in a static wasm viewer at `https://softmax.com/<slug>`, and an announcement in Discord
 `#coworlds`. No human is in the loop for any of it.
@@ -48,7 +48,7 @@ every write, so any heartbeat can resume where the last one stopped.
 | 50 | `prompts/50-league.md` | coordinator | league, division, settings, champions, fillers, trigger | both champions entrants; round triggered |
 | 60 | `prompts/60-verify.md` | verifier → judge | `runs/<run>/VERIFY.md` with fetched evidence | the definition-of-done checklist all-true |
 | 70 | `prompts/70-announce.md` | coordinator | Discord message id | message posted, id in STATE |
-| 75 | `prompts/75-atlas.md` | coordinator | one PR against `Metta-AI/metta` placing the coworld on `softmax.com/atlas` | PR opened (auto-merge armed), or the gap filed as a Fleet card |
+| 75 | `prompts/75-atlas.md` | coordinator | one PR against `softmax-universe/softmax` placing the coworld on `softmax.com/atlas` | PR opened (auto-merge armed), or the gap filed as a Fleet card |
 | 80 | `prompts/80-close.md` | coordinator | summaries, `learnings/LEARNINGS.md` entry | run task *Done*, idea task completed |
 | 90 | `prompts/90-blocked.md` | coordinator | run task *Blocked*, subtask assigned to a human | used by any phase that exhausts its retry budget |
 
@@ -76,7 +76,7 @@ run, stalled-queue escalation, claimable idea) and fires a deployment only then.
 with `ASANA_PAT` set to see the decision it would make; `--fire` needs `ANTHROPIC_API_KEY` (the org
 key). A board-read error prints the decision JSON and exits 1; a successful decision exits 0,
 including an idle queue. Errors also appear in the GitHub step summary. Check the
-[gate workflow](https://github.com/Metta-AI/coworld-builder/actions/workflows/heartbeat-gate.yml)
+[gate workflow](https://github.com/softmax-universe/coworld-builder/actions/workflows/heartbeat-gate.yml)
 for current health: each scheduled run retries, and a successful run clears the failure status.
 The gate sends no Discord alerts. The same script is the coordinator's `00-claim.md` step 0
 (`--summary`), so the sandbox and the gate compute the freshness and claim rules from one file.
@@ -140,7 +140,7 @@ because a bundle whose every asset returns 200 can still never draw a frame — 
 ## One-time human setup
 
 1. **CI credentials** live as repo secrets on this repo (`SOFTMAX_TOKEN`, `ANTHROPIC_API_KEY`,
-   `GH_PAT` — a user token that is admin on Metta-AI repos). `.github/workflows/propagate-secrets.yml`
+   `GH_PAT` — a user token that is admin on softmax-universe repos). `.github/workflows/propagate-secrets.yml`
    copies the first two onto each coworld repo; the coordinator dispatches it in phase 20. Nothing
    to do per run. (Set once 2026-08-22.)
 2. **`DISCORD_BOT_TOKEN` vault credential** → host `discord.com`, added to the deployment's
@@ -153,7 +153,7 @@ because a bundle whose every asset returns 200 can still never draw a frame — 
 4. **The Coworld Builder board** (`1217747772236871`): sections *Running*, *Blocked*, *Done*,
    *Fleet*; record the section gids in `fleet/cloud.md`. (There is no *Planned* section — the
    input queue is the separate Coworld Ideas board.)
-5. The GitHub identity behind `gh auth token` must be able to create repos under `Metta-AI`.
+5. The GitHub identity behind `gh auth token` must be able to create repos under `softmax-universe`.
 
 ## When a run is Blocked
 

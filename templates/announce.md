@@ -34,7 +34,7 @@ what beating them means, episode length, and how often the league runs a round.>
 <What the replay shows — the two or three things visible on screen that make an episode
 worth watching, in the viewer's own vocabulary.>
 
-Repo: https://github.com/Metta-AI/cogame-<slug>
+Repo: https://github.com/softmax-universe/cogame-<slug>
 ```
 
 ## Rules
@@ -64,7 +64,7 @@ The catch: customer demand is hidden from every seat and steps up exactly once, 
 
 The replay shows the conveyor — orders and shipments crawling stage to stage — the seismograph of each stage's orders against the hidden demand line, and every seat's weekly message and private notes.
 
-Repo: https://github.com/Metta-AI/cogame-bullwhip
+Repo: https://github.com/softmax-universe/cogame-bullwhip
 ```
 
 Note what the example does that the shape asks for: paragraph 1 is all mechanics and

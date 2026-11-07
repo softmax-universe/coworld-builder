@@ -7,7 +7,7 @@ question. You write the note. You do not write the game.
 ## What your brief gives you
 
 The run directory (`runs/<run>/` under `/workspace/coworld-builder`), the slug, the target
-repo name (`Metta-AI/cogame-<slug>`), the full text of the Coworld Idea, the path to
+repo name (`softmax-universe/cogame-<slug>`), the full text of the Coworld Idea, the path to
 `prompts/10-design.md`, and the output path for the note. Read, in this order:
 
 1. `/workspace/coworld-builder/prompts/10-design.md` — the phase prompt. It owns the section
@@ -40,7 +40,7 @@ viewer draws (scorebug, feed, clock), packaging (image, env switches, variants, 
 variant), and the tests the cert fixture and CI must assert.
 
 Every design pin from SPEC is answered explicitly, not assumed: starter by game shape; public
-`Metta-AI/cogame-<slug>`; LLM policy **and** scripted baseline from day one, same image,
+`softmax-universe/cogame-<slug>`; LLM policy **and** scripted baseline from day one, same image,
 env-switched; static wasm replay viewer, never a pod; real art with the starter's chrome kept
 verbatim; two name spaces (anonymous cog aliases in-game, policy names spectator-side);
 degrade-never-hang with play sized inside 60% of a 1200 s episode timeout; `num_agents` in

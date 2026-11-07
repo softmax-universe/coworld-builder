@@ -19,7 +19,7 @@
  ],
  "discord_channel_id": "1477593964675862618",
  "repo": {
-  "url": "https://github.com/Metta-AI/coworld-builder",
+  "url": "https://github.com/softmax-universe/coworld-builder",
   "mount_path": "/workspace/coworld-builder"
  },
  "schedule": "30 0 * * *",

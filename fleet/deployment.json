@@ -32,43 +32,43 @@
  "resources": [
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/coworld-builder",
+   "url": "https://github.com/softmax-universe/coworld-builder",
    "mount_path": "/workspace/coworld-builder",
    "authorization_token": "<resupply-at-apply>"
   },
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/cogame-babel",
+   "url": "https://github.com/softmax-universe/cogame-babel",
    "mount_path": "/workspace/starters/cogame-babel",
    "authorization_token": "<resupply-at-apply>"
   },
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/cogame-bullwhip",
+   "url": "https://github.com/softmax-universe/cogame-bullwhip",
    "mount_path": "/workspace/starters/cogame-bullwhip",
    "authorization_token": "<resupply-at-apply>"
   },
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/cogame-parley",
+   "url": "https://github.com/softmax-universe/cogame-parley",
    "mount_path": "/workspace/starters/cogame-parley",
    "authorization_token": "<resupply-at-apply>"
   },
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/coworld-ctf",
+   "url": "https://github.com/softmax-universe/coworld-ctf",
    "mount_path": "/workspace/starters/coworld-ctf",
    "authorization_token": "<resupply-at-apply>"
   },
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/cogame-moba",
+   "url": "https://github.com/softmax-universe/cogame-moba",
    "mount_path": "/workspace/starters/cogame-moba",
    "authorization_token": "<resupply-at-apply>"
   },
   {
    "type": "github_repository",
-   "url": "https://github.com/Metta-AI/cogame-factorio",
+   "url": "https://github.com/softmax-universe/cogame-factorio",
    "mount_path": "/workspace/starters/cogame-factorio",
    "authorization_token": "<resupply-at-apply>"
   }
