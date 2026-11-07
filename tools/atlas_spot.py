@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
 """Pick a free spot on a continent of the Softmax Atlas.
 
-Phase 75 runs this in the sandbox (no node needed) against the live places.mjs:
+Phase 75 runs this in the sandbox (no node needed) against the live geography files:
 
-  gh api repos/Metta-AI/metta/contents/web/softmax.com/src/scripts/atlas/places.mjs \
-    -H 'Accept: application/vnd.github.raw' > /tmp/places.mjs
-  python3 tools/atlas_spot.py --places /tmp/places.mjs --region commons
+  mkdir -p /tmp/atlas-geography
+  for file in cities.json regions.mjs region-paths.mjs; do
+    gh api "repos/softmax-universe/softmax/contents/workspaces/web/web-client/scripts/atlas/geography/$file" \
+      -H 'Accept: application/vnd.github.raw' > "/tmp/atlas-geography/$file"
+  done
+  python3 tools/atlas_spot.py --geography /tmp/atlas-geography --region commons
 
 It sweeps the continent's OUTLINE — `REGION_PATHS`, the same polygon the page
 hover-highlights and flies to, not the rectangular `box`, whose corners are open
-sea — and returns the candidate whose nearest neighbour is furthest away.
+sea — and finds a clear point near the existing cluster.
 Neighbours are every city inside that polygon, the region's own name anchor and
 the landmarks. Coordinates are in OVERVIEW units (the map as 1024x1024; world.jpg
 is exactly 3x that).
@@ -22,14 +25,18 @@ Output: `x y clearance` on stdout, the runners-up and the reasoning on stderr.
 """
 
 import argparse
+import json
 import re
 import sys
+from pathlib import Path
 
 
-def parse(src):
+def parse(geography):
     """(region -> {poly, anchor}, [(slug, x, y, region)], [(x, y)] landmarks)."""
     regions = {}
-    block = re.search(r"export const REGIONS = \{(.*?)\n\};", src, re.S)
+    src = (geography / "regions.mjs").read_text(encoding="utf-8")
+    paths_src = (geography / "region-paths.mjs").read_text(encoding="utf-8")
+    block = re.search(r"export const regions = \{(.*?)\n\};", src, re.S)
     if not block:
         sys.exit("atlas_spot: REGIONS block not found")
     for key, body in re.findall(r"\n  (\w+): \{(.*?)\n  \},", block.group(1) + "\n  },", re.S):
@@ -40,7 +47,7 @@ def parse(src):
             "box": [float(v) for v in box.group(1).split(",")] if box else None,
             "anchor": [float(xy.group(1)), float(xy.group(2))] if xy else None,
         }
-    paths = re.search(r"export const REGION_PATHS = \{(.*?)\n\};", src, re.S)
+    paths = re.search(r"export const regionPaths = \{(.*?)\n\};", paths_src, re.S)
     if not paths:
         sys.exit("atlas_spot: REGION_PATHS block not found")
     for key, body in re.findall(r"\n  (\w+): \[(.*?)\n  \],", paths.group(1) + "\n  ],", re.S):
@@ -48,19 +55,8 @@ def parse(src):
         if key in regions and len(pts) >= 3:
             regions[key]["poly"] = pts
 
-    cities = []
-    start = src.index("export const CITIES = [")
-    body = src[start : src.index("\n];", start)]
-    for entry in re.findall(r"\[[^\[\]]*\]", body):
-        quoted = re.findall(r'"([^"]*)"', entry)
-        # Numbers are read from the entry with its strings blanked out: a label
-        # like "Battlecode 2016" or a slug like "atari-57" must never be taken
-        # for the x coordinate (it was, and six leagues were spotted on top of
-        # each other).
-        unquoted = re.sub(r'"[^"]*"', '""', entry)
-        nums = re.findall(r"(?<![\w.])(\d+)(?![\w.])", unquoted)
-        if len(quoted) >= 3 and len(nums) >= 2:
-            cities.append((quoted[0], float(nums[0]), float(nums[1]), quoted[2]))
+    data = json.loads((geography / "cities.json").read_text(encoding="utf-8"))
+    cities = [(entry[0], float(entry[2]), float(entry[3]), entry[4]) for entry in data]
     marks = [(float(x), float(y)) for x, y in re.findall(r'\["[^"]*", (\d+), (\d+)\]', src)]
     return regions, cities, marks
 
@@ -92,14 +88,14 @@ def edge_gap(pt, poly):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--places", required=True)
+    ap.add_argument("--geography", required=True, type=Path)
     ap.add_argument("--region", required=True)
     ap.add_argument("--min", type=float, default=22.0, help="labels below this overlap")
     ap.add_argument("--coast", type=float, default=14.0, help="keep this far inside the outline")
     ap.add_argument("--step", type=float, default=3.0)
     args = ap.parse_args()
 
-    regions, cities, marks = parse(open(args.places, encoding="utf-8").read())
+    regions, cities, marks = parse(args.geography)
     if args.region not in regions:
         sys.exit(f"atlas_spot: unknown region {args.region!r} (known: {', '.join(sorted(regions))})")
     poly = regions[args.region]["poly"]

@@ -257,7 +257,11 @@ def custom_field(task, gid):
 
 
 def host_repo(text):
-    m = re.search(r"mod of (?:the existing )?`?(?:Metta-AI/)?([A-Za-z0-9_.\-]+)`?", text or "", re.I)
+    m = re.search(
+        r"mod of (?:the existing )?`?(?:(?:softmax-universe|Metta-AI)/)?([A-Za-z0-9_.\-]+)`?",
+        text or "",
+        re.I,
+    )
     return m.group(1).rstrip(".,;:)") if m else None
 
 

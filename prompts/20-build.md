@@ -17,19 +17,19 @@ Owner: builder sub-agent, driven by the coordinator. The sandbox cannot compile 
 1. Create the repo, **public** (public is a certification prerequisite; `source-resolves` 404s on
    private):
    ```bash
-   gh repo create Metta-AI/cogame-<slug> --public --description "<one line>"
+   gh repo create softmax-universe/cogame-<slug> --public --description "<one line>"
    ```
    Then, **before anything else**, give the new repo its CI credentials — it cannot release
    without them and the sandbox never holds the values:
    ```bash
-   gh workflow run propagate-secrets.yml -R Metta-AI/coworld-builder -f repo=cogame-<slug>
+   gh workflow run propagate-secrets.yml -R softmax-universe/coworld-builder -f repo=cogame-<slug>
    # find-the-new-run recipe (playbook), then:
-   gh run watch <id> -R Metta-AI/coworld-builder --exit-status
-   gh secret list -R Metta-AI/cogame-<slug>     # must list SOFTMAX_TOKEN
+   gh run watch <id> -R softmax-universe/coworld-builder --exit-status
+   gh secret list -R softmax-universe/cogame-<slug>     # must list SOFTMAX_TOKEN
    ```
 2. Send the **builder** brief (self-contained):
 
-   > Implement `Metta-AI/cogame-<slug>` from the design note at `<abs path to runs/<run>/design.md>`,
+   > Implement `softmax-universe/cogame-<slug>` from the design note at `<abs path to runs/<run>/design.md>`,
    > forking the conventions of `<starter>`, mounted read-only at
    > `/workspace/starters/<starter>`. Copy the starter's layout, chrome, and
    > build scripts verbatim where the note does not override them. Deliver on `main`:
@@ -112,11 +112,11 @@ Owner: builder sub-agent, driven by the coordinator. The sandbox cannot compile 
    the previous run. `ci.yml` here is push-triggered, so match on the sha you just pushed:
    ```bash
    SHA=$(git -C <repo checkout> rev-parse HEAD)
-   RUN=$(gh run list -R Metta-AI/cogame-<slug> --workflow ci.yml --event push \
+   RUN=$(gh run list -R softmax-universe/cogame-<slug> --workflow ci.yml --event push \
            --json databaseId,headSha,createdAt -L 10 \
          | jq -r --arg s "$SHA" '[.[]|select(.headSha==$s)]|sort_by(.createdAt)|last|.databaseId // empty')
-   gh run watch "$RUN" -R Metta-AI/cogame-<slug> --exit-status || \
-     gh run view "$RUN" -R Metta-AI/cogame-<slug> --log-failed
+   gh run watch "$RUN" -R softmax-universe/cogame-<slug> --exit-status || \
+     gh run view "$RUN" -R softmax-universe/cogame-<slug> --log-failed
    ```
 4. On red, feed the failing log back to the builder. Do not fix by weakening or deleting a test —
    that is failure, not completion.
@@ -151,7 +151,7 @@ error two phases later. GitHub only lists a workflow it could parse, so check th
 green sha:
 
 ```bash
-REPO=Metta-AI/cogame-<slug>
+REPO=softmax-universe/cogame-<slug>
 for WF in ci.yml coworld-release.yml coworld-submit.yml; do
   gh api "repos/$REPO/actions/workflows/$WF" -q '.name + " " + .state' || \
     { echo "::error::$WF did not parse / is not registered"; exit 1; }

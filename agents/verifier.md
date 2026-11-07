@@ -62,7 +62,7 @@ browser, so you do not render anything *here* — you **dispatch** the render an
 `prompts/60-verify.md` check 8 owns the exact commands; the shape is:
 
 1. Take the iframe `src` from item 6 (the full URL, `?replay=` and all) and run
-   `gh workflow run viewer-check.yml -R Metta-AI/coworld-builder -f url="$SRC"`. Find the new run
+   `gh workflow run viewer-check.yml -R softmax-universe/coworld-builder -f url="$SRC"`. Find the new run
    by sorting `gh run list -w viewer-check.yml --json databaseId,createdAt` — never by taking
    "the latest run" blind. `gh run watch "$RUN" --exit-status`; a **red run is data, not an
    abort** — download its artifact anyway and report the failure.

@@ -103,7 +103,7 @@ If the file is missing (a run whose phase 40 predates this rule), re-download it
 run id STATE recorded, then commit it — do **not** mark the check NOT FETCHED without trying:
 ```bash
 RR=$(jq -r '.coworld.release_run_id' runs/<run>/STATE.json)
-REPO=$(jq -r '.repo' runs/<run>/STATE.json)          # Metta-AI/cogame-<slug>
+REPO=$(jq -r '.repo' runs/<run>/STATE.json)          # softmax-universe/cogame-<slug>
 gh run download "$RR" -R "$REPO" -n release-result -D "runs/<run>"   # lands as release-result.json
 jq -r '.certify.replay_liveness' runs/<run>/release-result.json
 ```
@@ -118,16 +118,16 @@ reports whether a frame was ever drawn.
 *(a) Dispatch the load test against the iframe `src` from check 6.*
 ```bash
 SRC='<the full iframe src from check 6, including ?replay=>'
-gh workflow run viewer-check.yml -R Metta-AI/coworld-builder -f url="$SRC" -f timeout=90
+gh workflow run viewer-check.yml -R softmax-universe/coworld-builder -f url="$SRC" -f timeout=90
 # find-the-new-run: the dispatch API returns no run id, so poll for a run created
 # after the dispatch instead of grabbing "the latest", which races other runs.
 sleep 8
-RUN=$(gh run list -R Metta-AI/coworld-builder -w viewer-check.yml \
+RUN=$(gh run list -R softmax-universe/coworld-builder -w viewer-check.yml \
       --json databaseId,createdAt,status -L 10 \
       | jq -r 'sort_by(.createdAt)|reverse|.[0].databaseId')
-gh run watch "$RUN" -R Metta-AI/coworld-builder --exit-status || true   # a red run is DATA, not an abort
+gh run watch "$RUN" -R softmax-universe/coworld-builder --exit-status || true   # a red run is DATA, not an abort
 mkdir -p runs/<run>/viewer-check
-gh run download "$RUN" -R Metta-AI/coworld-builder -n viewer-check -D runs/<run>/viewer-check
+gh run download "$RUN" -R softmax-universe/coworld-builder -n viewer-check -D runs/<run>/viewer-check
 ```
 Commit `runs/<run>/viewer-check/` (the png and the json) with VERIFY.md — it is this run's only
 rendered evidence and the sandbox that produced it is gone by the next heartbeat.

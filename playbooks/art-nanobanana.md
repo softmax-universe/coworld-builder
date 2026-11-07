@@ -74,7 +74,7 @@ split the row on empty columns and pad each part to a square. `Pillow` is the on
 python3 -c 'import PIL' 2>/dev/null || python3 -m pip install --user pillow
 ```
 
-Copy `scripts/art/split_cog_sheet.py` from `Metta-AI/cogame-raid` (it is ~90 lines: key →
+Copy `scripts/art/split_cog_sheet.py` from `softmax-universe/cogame-raid` (it is ~90 lines: key →
 split → pad → resize to 128 px) and adjust `ROLES` to your file names. Run it, copy the output
 into both art directories the starter uses (`data/art/` and `client/art/` in raid; paintbot
 lineage uses only one), and leave the procedural generator in place for the assets you did not

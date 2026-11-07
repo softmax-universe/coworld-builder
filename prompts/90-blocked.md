@@ -50,7 +50,7 @@ equivalent API shapes. If the reason is on that list, go back and decide it.
    environment, e.g. rounds exist —
    `curl -sfS "$BASE/rounds?league_id=$L&limit=1" -H "Authorization: Bearer $SOFTMAX_TOKEN" -H "X-Use-Elevated-Privileges: true" | jq -e '.entries|length>0'`;
    pool funded — `... "$BASE/leagues/$L/owner-status" ... | jq -e '.credits.pool_credits>0'`;
-   secret present — `gh secret list -R Metta-AI/cogame-<slug> | grep -q '^SOFTMAX_TOKEN'`;
+   secret present — `gh secret list -R softmax-universe/cogame-<slug> | grep -q '^SOFTMAX_TOKEN'`;
    throttling gone — fetch the newest completed episode's hosted log and `! grep -q 'Too many
    tokens'`. A probe that cannot be written honestly means the ask is a human decision — say so
    in the subtask and set `probe: null`.

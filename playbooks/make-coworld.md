@@ -44,7 +44,7 @@ and poll until a `workflow_dispatch` run created at or after it appears (Z-suffi
 timestamps compare correctly as strings):
 
 ```bash
-REPO=Metta-AI/cogame-<slug>
+REPO=softmax-universe/cogame-<slug>
 WF=coworld-release.yml            # or ci.yml, coworld-submit.yml
 dispatched_at=$(date -u +%FT%TZ)
 gh workflow run "$WF" -R "$REPO" --ref main -f …
@@ -110,12 +110,12 @@ build → certify → **upload-policies** → upload-coworld → secret put. Pol
 
 | Game shape | Starter | Lineage |
 |---|---|---|
-| Turn-based / talk / cards / board / dice / bluff; game logic native; policy = LLM prompt | `Metta-AI/cogame-babel` (best current parley-stack template), else newest parley descendant (`cogame-bullwhip`, `cogame-focus`, `cogame-cosino`) | parley → cosino → focus → babel → bullwhip |
-| Any real-time game loop (grid or continuous physics) with rules written for this coworld, RL-vector policies | `Metta-AI/coworld-ctf` (paintbot) — "the best coworld we have" | ctf |
-| Bit-exact port of an existing, external C/RL env (rules pre-exist as code) | `Metta-AI/cogame-moba` + its `docs/PORTING.md` | moba → nmmo |
+| Turn-based / talk / cards / board / dice / bluff; game logic native; policy = LLM prompt | `softmax-universe/cogame-babel` (best current parley-stack template), else newest parley descendant (`cogame-bullwhip`, `cogame-focus`, `cogame-cosino`) | parley → cosino → focus → babel → bullwhip |
+| Any real-time game loop (grid or continuous physics) with rules written for this coworld, RL-vector policies | `softmax-universe/coworld-ctf` (paintbot) — "the best coworld we have" | ctf |
+| Bit-exact port of an existing, external C/RL env (rules pre-exist as code) | `softmax-universe/cogame-moba` + its `docs/PORTING.md` | moba → nmmo |
 
 New physics games (Cogball, Lantern, Tandem) take paintbot, not moba — operator ruling 2026-08-22.
-| Game logic in an external engine/process | `Metta-AI/cogame-factorio` (Python connector, per-seat servers) | factorio |
+| Game logic in an external engine/process | `softmax-universe/cogame-factorio` (Python connector, per-seat servers) | factorio |
 
 The local skill said "if the mapping isn't obvious, ASK". A cloud agent **does not ask** —
 starter choice is a rail it decides itself (SPEC §Rails). It escalates to phase 90 only when the
@@ -123,7 +123,7 @@ idea leaves a *rule* genuinely open and the readings give materially different g
 
 Pins that are never optional:
 
-- Repo `Metta-AI/cogame-<slug>`, **public** — public is a certification prerequisite
+- Repo `softmax-universe/cogame-<slug>`, **public** — public is a certification prerequisite
   (`source-resolves` 404s on private).
 - Build **both** an LLM/strategy policy and a scripted baseline from day one (same image,
   env-switched: `PLAYER_PROMPT` vs `PLAYER_SCRIPTED=<baseline name>`).
@@ -179,9 +179,9 @@ Repo must contain, before the first dispatch:
 - `.github/workflows/ci.yml` and `.github/workflows/coworld-release.yml` from `templates/`.
 
 ```bash
-gh repo create Metta-AI/cogame-<slug> --public --description "…"
+gh repo create softmax-universe/cogame-<slug> --public --description "…"
 git push -u origin main
-gh workflow run coworld-release.yml -R Metta-AI/cogame-<slug> --ref main -f version=0.1.0 -f policies='…'
+gh workflow run coworld-release.yml -R softmax-universe/cogame-<slug> --ref main -f version=0.1.0 -f policies='…'
 ```
 
 Then read `release-result.json` and require `canonical: true` and
@@ -341,7 +341,7 @@ that was already posted without the flag: `PATCH .../messages/<id>` with `{"flag
 | Manifest build: `KeyError: 'image'` in the coworld CLI's `bundle.py` | the image belongs at `game.runnable.image`, never `game.image` — the CLI only reads it inside `runnable` (cogame-continuous-control 0.1.0, 2026-08-29) |
 | Upload 400 `game runnable may not declare a cpu limit; only player pods honor one` | drop `game.runnable.resources.limits` entirely — resource limits are for `player[]` pods only (cogame-continuous-control 0.1.1, 2026-08-29) |
 | phase 50 seeds the Nth league of one coworld and rounds run, but the coworld's spend cap is missed within the day | the budget is per **coworld**, not per league: `GET /coworlds/<name>/budget` before seeding, and set `round_interval_minutes` to whatever the sibling leagues use rather than the prompt's 15. Nine battlecode year leagues at ~0.112 USD/round already spent 17.59 of 20.00 USD/day; a tenth at 15-minute cadence would have added ~96 rounds/day (battlecode-2024, 2026-09-11) |
-| phase 75 dispatch 1 fails `unplaced leagues (add them to CITIES in places.mjs): a, b, c` naming leagues that are not yours | `build.mjs` refuses while ANY live league is unplaced, so this is routine on a busy fleet, not a defect: place them too in `extra_cities` on dispatch 2 and name them in `log.md`. Budget one extra dispatch of the three for it (battlecode-2024 placed five, 2026-09-11) |
+| phase 75 dispatch 1 fails `unplaced leagues (add them to cities in geography/cities.json): a, b, c` naming leagues that are not yours | `build.mjs` refuses while ANY live league is unplaced, so this is routine on a busy fleet, not a defect: place them too in `extra_cities` on dispatch 2 and name them in `log.md`. Budget one extra dispatch of the three for it (battlecode-2024 placed five, 2026-09-11) |
 | an atlas dot lands inside another coworld's dashed territory ring | `tools/atlas_spot.py` avoids **cities** only, not `TERRITORIES`. Exclude `circ(cx,cy,r)` entries by `r + 6` (its arguments are overview units even though it emits image pixels — hence `raw: true`) and sample `path:` territories' cubic beziers into a polygon first. When your coworld already owns a territory with a lattice of sibling dots, skip the sweep and fill the lattice hole (battlecode-2024 at 202,270, 2026-09-11) |
 | a sub-agent leg dies in-sandbox three times leaving nothing on disk, with no error to triage | pin **incremental writing** in every brief — "create the skeleton file as your first action, append each item as you trace it" — so a dead thread leaves a recoverable partial. If it still dies, say in the phase-90 ask that the same brief completes outside the sandbox when that is what the evidence shows; battlecode-2024's phase 30 was unblocked by an operator running the identical reviewer brief locally (2026-09-11) |
 | A chrome/label fix (killfeed, endcard wording) that greps absent from the replay bytes in BOTH versions | beat labels are computed at **view** time by `broadcast.nim`'s `beatsFor*`, compiled into the wasm viewer bundle — no label string is ever written into a `.replay`. Prove such a fix from a rendered frame reconciled against the raw event, not a byte grep; it still needs a release (the bundle is keyed to `<cow_id>/<manifest_hash>`) and it applies retroactively to old replays (cogame-battlecode 0.8.2, 2026-09-09) |

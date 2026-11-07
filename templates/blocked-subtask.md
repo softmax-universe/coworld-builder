@@ -17,7 +17,7 @@ BLOCKED <slug> @<phase>: <one-line ask>
 ```
 
 The one-line ask is the **decision, credential, or action a human must supply** — not a
-description of the symptom. Good: `grant Metta-AI org secret SOFTMAX_TOKEN to cogame-tessera`.
+description of the symptom. Good: `grant softmax-universe org secret SOFTMAX_TOKEN to cogame-tessera`.
 Bad: `certification keeps failing`.
 
 ## Body
@@ -40,7 +40,7 @@ WHAT I NEED
 
 CONTEXT
 Run:   runs/<run>/ (STATE.json, log.md)
-Repo:  https://github.com/Metta-AI/cogame-<slug>
+Repo:  https://github.com/softmax-universe/cogame-<slug>
 Phase: <phase> — <phase name>
 
 Resume: complete this subtask; the next heartbeat resumes at phase <phase>.

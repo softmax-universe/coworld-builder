@@ -6,7 +6,7 @@ it first, then them.
 ## Mission
 
 A managed agent takes one **Coworld Idea** (Asana project `1217704774784096`, "Coworld Ideas")
-and carries it to **done**: a public `Metta-AI/cogame-<slug>` repo, a certified coworld on
+and carries it to **done**: a public `softmax-universe/cogame-<slug>` repo, a certified coworld on
 softmax.com, a league with two ranked champions and fillers, ≥2 completed rounds with valid
 replays rendered by a **static** viewer on `https://softmax.com/<slug>`, an announcement in
 Discord `#coworlds`, and a dot on the Softmax Atlas (`https://softmax.com/atlas`). When it cannot, it marks the run **Blocked** with a subtask for a human
@@ -113,7 +113,7 @@ that names exactly what is needed, and exits.
 - The sandbox has **no Docker, no Nim, no emsdk**. Every compile / image / certification /
   upload step runs in **GitHub Actions inside the coworld repo** from templates in this repo.
   The agent pushes, dispatches workflows (`gh workflow run`), polls (`gh run watch`), and
-  reads logs. CI credentials are repo secrets `SOFTMAX_TOKEN` and `ANTHROPIC_API_KEY`, propagated onto each coworld repo by dispatching `propagate-secrets.yml` in `Metta-AI/coworld-builder` (`gh workflow run propagate-secrets.yml -R Metta-AI/coworld-builder -f repo=cogame-<slug>`; it runs with a user token that is admin on Metta-AI repos — no org admin, no value ever in the sandbox).
+  reads logs. CI credentials are repo secrets `SOFTMAX_TOKEN` and `ANTHROPIC_API_KEY`, propagated onto each coworld repo by dispatching `propagate-secrets.yml` in `softmax-universe/coworld-builder` (`gh workflow run propagate-secrets.yml -R softmax-universe/coworld-builder -f repo=cogame-<slug>`; it runs with a user token that is admin on softmax-universe repos — no org admin, no value ever in the sandbox).
 - Everything else (Observatory API, `softmax.com`, Asana, Discord, GitHub) is HTTPS from the
   sandbox using vault credentials substituted at egress (`SOFTMAX_TOKEN`, `GH_TOKEN`,
   `ASANA_PAT`, `DISCORD_BOT_TOKEN`, `GEMINI_API_KEY` — the last for nano-banana board art, see
@@ -127,7 +127,7 @@ that names exactly what is needed, and exits.
 ### Parallelism and per-run isolation
 
 Runs are isolated by construction: each has its own `runs/<run>/` directory, its own Asana run
-task, its own `Metta-AI/cogame-<slug>` repo, its own league, division, champions and fillers.
+task, its own `softmax-universe/cogame-<slug>` repo, its own league, division, champions and fillers.
 Nothing in a run's working set is shared with another run. The only shared surfaces are:
 
 - `runs/heartbeats.log` and `runs/SKIPPED.json` — the two append-only files at the root of
@@ -156,7 +156,7 @@ new claims and leaves runs in flight alone.
 | 50 | `prompts/50-league.md` | coordinator | league seed, division, settings, champion #1 (daveey), champion #2 (daveey-1), fillers, unpause, trigger | both champions show as entrants; round triggered |
 | 60 | `prompts/60-verify.md` | verifier → judge | `runs/<run>/VERIFY.md` with fetched evidence | the *definition of done* checklist all-true |
 | 70 | `prompts/70-announce.md` | coordinator | Discord message id | message posted, id in STATE |
-| 75 | `prompts/75-atlas.md` | coordinator | one PR against `Metta-AI/metta`: the coworld's `CITIES` line in `places.mjs` + the regenerated `public/atlas/index.html` | `STATE.atlas.status` is `pr_open`, `already_placed` or `unplaced` |
+| 75 | `prompts/75-atlas.md` | coordinator | one PR against `softmax-universe/softmax`: the coworld's entry in `geography/cities.json` + the regenerated `public/atlas/index.html` | `STATE.atlas.status` is `pr_open`, `already_placed` or `unplaced` |
 | 80 | `prompts/80-close.md` | coordinator | executive summary on run task + idea task, `learnings/LEARNINGS.md` entry, run task → *Done*, idea task completed | — |
 | 90 | `prompts/90-blocked.md` | coordinator | run task → *Blocked*, subtask → human, STATE.blocked | used by any phase on exhausting its retry budget |
 
@@ -215,7 +215,7 @@ is bounded at 75 minutes of wall clock.
 Starter by game shape (parley/babel for LLM-prompt games; coworld-ctf for ANY real-time loop —
 grid or continuous physics — with new rules; cogame-moba only for bit-exact ports of an existing
 external env; cogame-factorio for external engines). Public repo
-`Metta-AI/cogame-<slug>`. LLM policy **and** scripted baseline from day one (same image,
+`softmax-universe/cogame-<slug>`. LLM policy **and** scripted baseline from day one (same image,
 env-switched). Static wasm replay viewer — never a pod. Real art, the starter's chrome
 verbatim. Two name spaces (anonymous cog aliases in-game; policy names spectator-side).
 Degrade-never-hang (assume `episodeTimeoutSeconds` 1200, play inside 60 % of it).
@@ -252,7 +252,7 @@ in `prompts/30-review-loop.md` and is the only source of "blocking".
 `runs/<YYYY-MM-DD>-<slug>/STATE.json`:
 ```json
 {"run": "2026-08-22-bullwhip", "idea_task": "1217704516752265", "run_task": "…",
- "slug": "bullwhip", "repo": "Metta-AI/cogame-bullwhip", "starter": "cogame-babel",
+ "slug": "bullwhip", "repo": "softmax-universe/cogame-bullwhip", "starter": "cogame-babel",
  "phase": "60", "phase_attempts": {"40": 2}, "review_round": 3,
  "coworld": {"version": "0.1.2", "cow_id": "cow_…", "manifest_sha": "sha256:…",
               "release_run_id": "17423991055"},
@@ -330,7 +330,7 @@ docs/SPEC.md             this file
 prompts/00…90-*.md       phase prompts (the coordinator reads the phase's prompt when it enters it)
 agents/<role>.md         sub-agent system prompts: designer, builder, reviewer, fixer, judge, verifier
 agents/<role>.json       model + tools manifest (fleetctl-style)
-tools/atlas_place.py     edits CITIES in metta's places.mjs (run by atlas-update.yml, phase 75)
+tools/atlas_place.py     edits cities in Softmax geography/cities.json (run by atlas-update.yml, phase 75)
 tools/atlas_spot.py      picks free coordinates on a continent (run in the sandbox, phase 75)
 templates/               ci.yml, coworld-release.yml, coworld-submit.yml, tools/ci/docker_smoke.sh,
                          tools/ci/policies.json.example, run-task.md, blocked-subtask.md, announce.md,

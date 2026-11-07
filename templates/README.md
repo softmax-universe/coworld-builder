@@ -1,6 +1,6 @@
 # templates/
 
-Files a coworld-builder agent copies into a freshly created `Metta-AI/cogame-<slug>` repo
+Files a coworld-builder agent copies into a freshly created `softmax-universe/cogame-<slug>` repo
 (the workflows and the shell/JS/JSON under `tools/`), plus the Asana/Discord/state templates the
 coordinator fills in from the sandbox.
 
@@ -226,7 +226,7 @@ It parses `Coworld: cow_…`, `Manifest hash: sha256:…`, `Canonical: yes|no`,
 the job if `canonical` is not `true`. Read it back with:
 
 ```bash
-gh run download <run_id> -R Metta-AI/cogame-<slug> -n release-result -D /tmp/rr
+gh run download <run_id> -R softmax-universe/cogame-<slug> -n release-result -D /tmp/rr
 jq . /tmp/rr/release-result.json
 ```
 

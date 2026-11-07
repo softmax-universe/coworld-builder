@@ -25,10 +25,10 @@ in some `runs/*/STATE.json` (or its gid in `runs/SKIPPED.json`), not the title
 
 ```
 Idea:  <idea task url>
-Repo:  https://github.com/Metta-AI/cogame-<slug>
+Repo:  https://github.com/softmax-universe/cogame-<slug>
 Page:  https://softmax.com/<slug>
-Run:   runs/<run>/ in Metta-AI/coworld-builder (STATE.json, log.md, reviews/, VERIFY.md)
-CI:    https://github.com/Metta-AI/cogame-<slug>/actions
+Run:   runs/<run>/ in softmax-universe/coworld-builder (STATE.json, log.md, reviews/, VERIFY.md)
+CI:    https://github.com/softmax-universe/cogame-<slug>/actions
 
 Coordinator: coworld-builder heartbeats a/b/c (minutes 11/31/51 UTC). This task is this run's
 lock: a fresh heartbeat_at (the custom field, not this text) means a session is working it and
@@ -47,7 +47,7 @@ Phases (SPEC §Phases). The current phase is the first unchecked line.
                       fillers set BEFORE the first trigger-round
 - [ ] 60 verify     — runs/<run>/VERIFY.md; every line of SPEC §Definition of done fetched
 - [ ] 70 announce   — posted in Discord #coworlds; message id in STATE
-- [ ] 75 atlas      — one PR against Metta-AI/metta placing the coworld on
+- [ ] 75 atlas      — one PR against softmax-universe/softmax placing the coworld on
                       softmax.com/atlas; auto-merge armed
 - [ ] 80 close      — executive summary here and on the idea task; LEARNINGS entry;
                       this task Done, idea task completed

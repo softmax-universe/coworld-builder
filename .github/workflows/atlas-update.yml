@@ -2,15 +2,15 @@
 #
 # This is phase 75's instrument. The coworld-builder sandbox has no node and no
 # metta mount, and the atlas is a build-time snapshot: adding a coworld means
-# editing `places.mjs` in Metta-AI/metta, re-running two node scripts, and
+# editing `geography/cities.json` in softmax-universe/softmax, refreshing the snapshot, and
 # committing the regenerated page. So the coordinator picks the coordinates and
 # this workflow does the mechanical half.
 #
-#   gh workflow run atlas-update.yml -R Metta-AI/coworld-builder \
+#   gh workflow run atlas-update.yml -R softmax-universe/coworld-builder \
 #     -f slug=escrow -f label=Escrow -f x=512 -f y=470 -f region=commons \
 #     -f anchor=c -f run=2026-08-23-escrow
 #
-# It opens ONE pull request against Metta-AI/metta and arms auto-merge. Every
+# It opens ONE pull request against softmax-universe/softmax and arms auto-merge. Every
 # dispatch branches from a fresh origin/main under a run-unique name, so a retry
 # is a new branch and never a force-push (AGENT.md hard rule 2).
 #
@@ -90,21 +90,23 @@ jobs:
     env:
       GH_TOKEN: ${{ secrets.GH_PAT }}
       METTA: metta
-      ATLAS: metta/web/softmax.com/src/scripts/atlas
+      ATLAS: metta/workspaces/web/web-client/scripts/atlas
     steps:
       - uses: actions/checkout@v5
 
       - uses: actions/checkout@v5
         with:
-          repository: Metta-AI/metta
+          repository: softmax-universe/softmax
           path: metta
           token: ${{ secrets.GH_PAT }}
-          # Cone mode also brings the root files, which is where biome.json is.
-          sparse-checkout: web/softmax.com
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24.14.1"
+
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+        with:
+          version: "10.28.0"
 
       - name: Branch from a fresh main
         id: branch
@@ -119,7 +121,16 @@ jobs:
         env:
           SLUG: ${{ inputs.slug }}
 
-      - name: Place the coworld in places.mjs
+      - name: Install workspace dependencies
+        run: |
+          set -euo pipefail
+          cd "$METTA"
+          if ! pnpm install --frozen-lockfile --ignore-scripts 2>&1 | tee /tmp/install.log; then
+            { echo "step=install"; tail -20 /tmp/install.log; } > /tmp/atlas-error.txt
+            exit 1
+          fi
+
+      - name: Place the coworld in geography/cities.json
         id: place
         run: |
           set -euo pipefail
@@ -132,7 +143,7 @@ jobs:
           PY
           )
           if ! python3 tools/atlas_place.py \
-                 --places "$ATLAS/places.mjs" --add "$ADD" --drop "$DROP" 2>&1 | tee /tmp/place.log; then
+                 --geography "$ATLAS/geography" --add "$ADD" --drop "$DROP" 2>&1 | tee /tmp/place.log; then
             { echo "step=place"; tail -20 /tmp/place.log; } > /tmp/atlas-error.txt
             exit 1
           fi
@@ -147,34 +158,30 @@ jobs:
           EXTRA: ${{ inputs.extra_cities }}
           DROP: ${{ inputs.drop_slugs }}
 
-      # fetch-stats reads softmax.com (~1 min) and exits non-zero if a league
-      # page fails or fewer than half yield standings; build.mjs then refuses a
-      # stats file carrying an `error` entry, and refuses to render at all while
-      # any live league has no CITIES line. Both failures are reported verbatim
-      # to the coordinator through atlas-result.json.
+      # The snapshot fetch reads softmax.com; the build rejects fetch errors and
+      # unplaced leagues. Report failures to the coordinator through atlas-result.json.
       - name: Refresh the standings snapshot and rebuild the page
         id: build
         run: |
           set -euo pipefail
-          cd "$METTA/web/softmax.com"
-          if ! node src/scripts/atlas/fetch-stats.mjs 2>&1 | tee /tmp/fetch.log; then
+          cd "$METTA/workspaces/web/web-client"
+          if ! pnpm exec tsx scripts/atlas/fetch-stats.ts 2>&1 | tee /tmp/fetch.log; then
             { echo "step=fetch-stats"; tail -20 /tmp/fetch.log; } > /tmp/atlas-error.txt
             exit 1
           fi
-          if ! node src/scripts/atlas/build.mjs 2>&1 | tee /tmp/build.log; then
+          if ! node scripts/atlas/build.mjs 2>&1 | tee /tmp/build.log; then
             { echo "step=build"; tail -20 /tmp/build.log; } > /tmp/atlas-error.txt
             exit 1
           fi
 
-      # places.mjs and the stats JSON are biome-formatted in this repo; the
-      # generated page is not (biome.json excludes **/public).
+      # Format the maintained JSON files with the workspace formatter.
       - name: Format what we touched
         run: |
           set -euo pipefail
           cd "$METTA"
-          if ! npx --yes @biomejs/biome@2.5.6 format --write \
-                 web/softmax.com/src/scripts/atlas/places.mjs \
-                 web/softmax.com/src/scripts/atlas/data/coworld-stats.json 2>&1 | tee /tmp/fmt.log; then
+          if ! pnpm exec oxfmt --write \
+                 workspaces/web/web-client/scripts/atlas/geography/cities.json \
+                 workspaces/web/web-client/scripts/atlas/data/coworld-stats.json 2>&1 | tee /tmp/fmt.log; then
             { echo "step=format"; tail -20 /tmp/fmt.log; } > /tmp/atlas-error.txt
             exit 1
           fi
@@ -184,9 +191,9 @@ jobs:
         run: |
           set -euo pipefail
           cd "$METTA"
-          git add web/softmax.com/src/scripts/atlas/places.mjs \
-                  web/softmax.com/src/scripts/atlas/data/coworld-stats.json \
-                  web/softmax.com/public/atlas/index.html
+          git add workspaces/web/web-client/scripts/atlas/geography/cities.json \
+                  workspaces/web/web-client/scripts/atlas/data/coworld-stats.json \
+                  workspaces/web/web-client/public/atlas/index.html
           if git diff --cached --quiet; then
             echo "status=already_placed" >> "$GITHUB_OUTPUT"
             echo "Nothing to commit: $SLUG is already on the atlas and the page is current."
@@ -198,13 +205,13 @@ jobs:
             "Adds \`$SLUG\` to the atlas and refreshes the standings snapshot." \
             "" \
             "- league: https://softmax.com/$SLUG" \
-            "- run: ${RUN:-(manual dispatch)} (Metta-AI/coworld-builder, phase 75)" \
+            "- run: ${RUN:-(manual dispatch)} (softmax-universe/coworld-builder, phase 75)" \
             "- dispatch: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
             "" \
-            "\`places.mjs\` gains one CITIES line; \`data/coworld-stats.json\` and" \
-            "\`public/atlas/index.html\` are regenerated by \`fetch-stats.mjs\` +" \
+            "\`geography/cities.json\` gains one city entry; \`data/coworld-stats.json\` and" \
+            "\`public/atlas/index.html\` are regenerated by \`fetch-stats.ts\` +" \
             "\`build.mjs\`. \`data/ideas.json\` is deliberately untouched.")
-          URL=$(gh pr create -R Metta-AI/metta --base main --head "$BRANCH" \
+          URL=$(gh pr create -R softmax-universe/softmax --base main --head "$BRANCH" \
                   --title "atlas: $SLUG" --body "$BODY")
           echo "pr_url=$URL" >> "$GITHUB_OUTPUT"
           echo "status=pr_open" >> "$GITHUB_OUTPUT"

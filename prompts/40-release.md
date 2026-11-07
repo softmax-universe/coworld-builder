@@ -8,7 +8,7 @@ repo (SPEC §Phases, `AGENT.md` §Sub-agents, `agents/builder.md` §Release). No
 
 - `STATE.repo`, `STATE.slug`, `runs/<run>/design.md` (policy prompts and baseline switches).
 - `playbooks/make-coworld.md` §Phase 1/2.
-- The coworld repo's repo secrets `SOFTMAX_TOKEN`, propagated onto each coworld repo by dispatching `propagate-secrets.yml` in `Metta-AI/coworld-builder` (`gh workflow run propagate-secrets.yml -R Metta-AI/coworld-builder -f repo=cogame-<slug>`; it runs with a user token that is admin on Metta-AI repos — no org admin, no value ever in the sandbox) — set in phase 20; if `gh secret list -R Metta-AI/cogame-<slug>` does not show it, dispatch it again before the release.
+- The coworld repo's repo secrets `SOFTMAX_TOKEN`, propagated onto each coworld repo by dispatching `propagate-secrets.yml` in `softmax-universe/coworld-builder` (`gh workflow run propagate-secrets.yml -R softmax-universe/coworld-builder -f repo=cogame-<slug>`; it runs with a user token that is admin on softmax-universe repos — no org admin, no value ever in the sandbox) — set in phase 20; if `gh secret list -R softmax-universe/cogame-<slug>` does not show it, dispatch it again before the release.
 
 ## Procedure
 
@@ -54,7 +54,7 @@ repo (SPEC §Phases, `AGENT.md` §Sub-agents, `agents/builder.md` §Release). No
    `gh run list -L 1` right after the dispatch watches the **previous** run and downloads its
    stale `release-result.json` as this dispatch's evidence — do not use it.
    ```bash
-   REPO=Metta-AI/cogame-<slug>
+   REPO=softmax-universe/cogame-<slug>
    WF=coworld-release.yml
    # POLICIES is only needed to OVERRIDE tools/ci/policies.json for this one dispatch:
    POLICIES=$(jq -c . tools/ci/policies.json)   # or: jq -nc '[{name:…,run:…,env:{…}}, …]'

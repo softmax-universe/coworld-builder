@@ -226,7 +226,7 @@ Inputs: `player_id`, `policy` (`<name>:vN`), `league_id`. `concurrency: coworld-
 Submission stays in its own workflow — do not fold it into the release workflow.
 
 ```bash
-gh workflow run coworld-submit.yml -R Metta-AI/cogame-<slug> --ref main \
+gh workflow run coworld-submit.yml -R softmax-universe/cogame-<slug> --ref main \
   -f player_id=ply_44ae9048-3242-4654-881f-6d9d43347fa3 \
   -f policy="$CH1" -f league_id="$L"      # CH1 = STATE.policies.champion1, e.g. bullwhip-steady:v1
 ```
@@ -268,7 +268,7 @@ curl -sS -X POST "https://discord.com/api/v10/channels/1440464430646427718/messa
   -d '{"content":"…"}'
 
 # GitHub
-GH_TOKEN=$GH_TOKEN gh workflow run … -R Metta-AI/cogame-<slug>
+GH_TOKEN=$GH_TOKEN gh workflow run … -R softmax-universe/cogame-<slug>
 ```
 
 ### Asana section moves (phases 00, 80, 90)
